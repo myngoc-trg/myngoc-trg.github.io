@@ -1,0 +1,99 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import ProjectCard from '../../components/ProjectCard.astro';
+import {projects } from '../../data/projects';
+
+const projectFilters = ['All', 'Work', 'Study'] as const;
+---
+
+<BaseLayout
+  title="Projects"
+  description="Study and professional projects across machine learning, statistics, analytics, and data engineering by Nancy Truong."
+>
+  <section class="page-hero">
+    <div class="shell page-hero-grid">
+      <div>
+        <p class="eyebrow">Project archive</p>
+        <h2>What I have built and learned</h2>
+        <p>
+          Study and professional work. Confidential details are anonymised.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <section class="projects-archive section-pad">
+    <div class="shell">
+      <div class="project-tools">
+        <label class="project-search">
+          <span class="sr-only">Search projects</span>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m21 21-4.4-4.4m2.4-5.1a7.5 7.5 0 1 1-15 0 7.5 7.5 0 0 1 15 0Z" /></svg>
+          <input type="search" placeholder="Search projects or skills" data-project-search />
+        </label>
+
+        <div class="filter-toolbar" aria-label="Filter projects">
+          {projectFilters.map((filter, index) => (
+            <button
+              class:list={['filter-button', { active: index === 0 }]}
+              type="button"
+              data-filter={filter}
+              aria-pressed={index === 0 ? 'true' : 'false'}
+            >
+              {filter}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div class="project-grid archive-grid">
+        {projects.map((project) => <ProjectCard project={project} />)}
+      </div>
+
+      <div class="empty-state" hidden data-empty-state>
+        <h2>No matching project</h2>
+        <p>Try another search term or choose “All”.</p>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<script>
+  const cards = [...document.querySelectorAll<HTMLElement>('[data-project-card]')];
+  const filters = [...document.querySelectorAll<HTMLButtonElement>('[data-filter]')];
+  const search = document.querySelector<HTMLInputElement>('[data-project-search]');
+  const emptyState = document.querySelector<HTMLElement>('[data-empty-state]');
+  let activeFilter = 'All';
+
+  const updateProjects = () => {
+    const query = search?.value.trim().toLowerCase() ?? '';
+    let visible = 0;
+
+    cards.forEach((card) => {
+      const kind = card.dataset.kind ?? '';
+      const text = card.textContent?.toLowerCase() ?? '';
+      const matchesSearch = !query || text.includes(query);
+      const matchesFilter =
+          activeFilter === 'All' ||
+          kind === activeFilter;
+      const show = matchesFilter && matchesSearch;
+      card.hidden = !show;
+      if (show) visible += 1;
+    });
+
+    if (emptyState) emptyState.hidden = visible !== 0;
+  };
+
+  filters.forEach((button) => {
+    button.addEventListener('click', () => {
+      activeFilter = button.dataset.filter ?? 'All';
+      filters.forEach((item) => {
+        const active = item === button;
+        item.classList.toggle('active', active);
+        item.setAttribute('aria-pressed', String(active));
+      });
+      updateProjects();
+    });
+  });
+
+  search?.addEventListener('input', updateProjects);
+</script>

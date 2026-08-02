@@ -1,0 +1,36 @@
+---
+import type { Project } from '../data/projects';
+
+interface Props {
+  project: Project;
+  compact?: boolean;
+}
+
+const { project, compact = false } = Astro.props;
+---
+
+<article
+  class:list={['project-card', { compact }]}
+  data-project-card
+  data-kind={project.kind}
+  data-area={project.area}
+>
+  <a class="project-card-link" href={`/projects/${project.slug}/`} aria-label={`Read ${project.title}`}>
+    <div class="project-card-image">
+      <img src={project.image} alt="" loading="lazy" width="1200" height="900" />
+      <div class="project-card-badges">
+        <span>{project.kind}</span>
+        <span>{project.area}</span>
+      </div>
+    </div>
+
+    <div class="project-card-body">
+      <h3>{project.title}</h3>
+      <p>{project.summary}</p>
+      {!compact && <strong class="project-highlight">{project.highlight}</strong>}
+      <ul class="tag-list" aria-label={`${project.title} skills`}>
+        {project.skills.slice(0, compact ? 3 : 5).map((skill) => <li>{skill}</li>)}
+      </ul>
+    </div>
+  </a>
+</article>

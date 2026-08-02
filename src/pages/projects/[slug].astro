@@ -1,0 +1,688 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { projects } from '../../data/projects';
+
+export function getStaticPaths() {
+  return projects.map((project) => ({
+    params: {
+      slug: project.slug,
+    },
+    props: {
+      project,
+    },
+  }));
+}
+
+const { project } = Astro.props;
+
+const currentIndex = projects.findIndex(
+  (item) => item.slug === project.slug
+);
+
+const nextProject =
+  projects[(currentIndex + 1) % projects.length];
+
+const previousProject =
+  projects[
+    (currentIndex - 1 + projects.length) %
+      projects.length
+  ];
+
+const galleryImages =
+  project.gallery && project.gallery.length > 0
+    ? project.gallery
+    : [
+        {
+          src: project.image,
+          alt: `${project.title} project visual`,
+          caption: '',
+        },
+      ];
+---
+
+<BaseLayout
+  title={project.title}
+  description={project.summary}
+  image={project.image}
+>
+  <article class="case-study">
+    <header class="case-hero">
+      <div class="shell case-hero-inner">
+        <a class="breadcrumb" href="/projects/">
+          ← All projects
+        </a>
+
+       <div class="case-hero-intro">
+  <div class="case-hero-content">
+    <div class="case-labels">
+      <span>{project.kind}</span>
+      <span>{project.area}</span>
+      <span>{project.year}</span>
+    </div>
+
+    <h1>{project.title}</h1>
+
+    <div class="case-hero-overview">
+      <p>{project.summary}</p>
+
+      <strong>
+        {project.highlight}
+      </strong>
+
+      <ul
+        class="tag-list large"
+        aria-label="Skills used"
+      >
+        {
+          project.skills.map((skill) => (
+            <li>{skill}</li>
+          ))
+        }
+      </ul>
+    </div>
+  </div>
+
+  {
+    project.titleImage && (
+      <figure class="case-title-image">
+        <img
+          src={project.titleImage}
+          alt={
+            project.titleImageAlt ??
+            `${project.title} project image`
+          }
+          loading="eager"
+          decoding="async"
+        />
+      </figure>
+    )
+  }
+</div>
+
+      </div>
+    </header>
+
+<section class="star-section section-pad">
+  <div class="shell">
+    <div class="section-heading compact-heading">
+      <p class="eyebrow">Project story</p>
+
+      <h2>
+        Problem, responsibility, approach, and outcome
+      </h2>
+    </div>
+
+    <div class="star-grid">
+      <section class="star-card">
+        <div>
+          <h3>Situation</h3>
+          <p>{project.situation}</p>
+        </div>
+      </section>
+
+      <section class="star-card">
+        <div>
+          <h3>Task</h3>
+          <p>{project.task}</p>
+        </div>
+      </section>
+
+
+
+      <section class="star-card wide">
+        <div>
+          <h3>Action</h3>
+
+          <ul>
+            {
+              project.actions.map((action) => (
+                <li>{action}</li>
+              ))
+            }
+          </ul>
+        </div>
+      </section>
+
+
+      <section class="star-card wide">
+        <div>
+          <h3>Result</h3>
+
+          <ul>
+            {
+              project.results.map((result) => (
+                <li>{result}</li>
+              ))
+            }
+          </ul>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  
+            <div class="star-gallery">
+  <div
+    class="project-gallery"
+    data-project-gallery
+    aria-label={`${project.title} image gallery`}
+  >
+    <div class="project-gallery-frame">
+      <div class="project-gallery-stage">
+        {
+          galleryImages.map((image, index) => (
+            <figure
+              id={`project-gallery-slide-${project.slug}-${index}`}
+              class:list={[
+                'project-gallery-slide',
+                { 'is-active': index === 0 },
+              ]}
+              data-gallery-slide
+              aria-hidden={index === 0 ? 'false' : 'true'}
+              hidden={index !== 0}
+            >
+              <button
+              class="project-gallery-zoom-button"
+              type="button"
+              data-gallery-zoom
+              data-gallery-index={index}
+              aria-label={`Open ${image.alt} in a larger view`}
+            >
+              <img
+                src={image.src}
+                alt={image.alt}
+                loading={index === 0 ? 'eager' : 'lazy'}
+                decoding="async"
+              />
+            </button>
+              {
+                image.caption && (
+                  <figcaption>
+                    {image.caption}
+                  </figcaption>
+                )
+              }
+            </figure>
+          ))
+        }
+      </div>
+
+      {
+        galleryImages.length > 1 && (
+          <>
+            <button
+              class="project-gallery-arrow project-gallery-arrow-previous"
+              type="button"
+              data-gallery-previous
+              aria-label="Show previous project image"
+            >
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="m15 18-6-6 6-6"></path>
+              </svg>
+            </button>
+
+            <button
+              class="project-gallery-arrow project-gallery-arrow-next"
+              type="button"
+              data-gallery-next
+              aria-label="Show next project image"
+            >
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="m9 18 6-6-6-6"></path>
+              </svg>
+            </button>
+
+            <p
+              class="project-gallery-counter"
+              aria-live="polite"
+            >
+              <span data-gallery-current>1</span>
+              <span aria-hidden="true"> / </span>
+              <span>{galleryImages.length}</span>
+            </p>
+          </>
+        )
+      }
+    </div>
+
+    {
+      galleryImages.length > 1 && (
+        <div
+          class="project-gallery-thumbnails"
+          aria-label="Choose a project image"
+        >
+          {
+            galleryImages.map((image, index) => (
+              <button
+                class:list={[
+                  'project-gallery-thumbnail',
+                  { 'is-active': index === 0 },
+                ]}
+                type="button"
+                data-gallery-thumbnail
+                data-gallery-index={index}
+                aria-label={`Show image ${index + 1}: ${image.alt}`}
+                aria-controls={`project-gallery-slide-${project.slug}-${index}`}
+                aria-current={index === 0 ? 'true' : undefined}
+              >
+                <img
+                  src={image.src}
+                  alt=""
+                  loading="lazy"
+                  decoding="async"
+                />
+              </button>
+            ))
+          }
+        </div>
+      )
+    }
+  </div>
+</div>
+</section>
+
+<dialog
+  class="project-lightbox"
+  data-project-lightbox
+  aria-label="Expanded project image"
+>
+  <button
+    class="project-lightbox-close"
+    type="button"
+    data-project-lightbox-close
+    aria-label="Close expanded image"
+  >
+    ×
+  </button>
+    <button
+    class="project-lightbox-arrow project-lightbox-arrow-previous"
+    type="button"
+    data-project-lightbox-previous
+    aria-label="Show previous enlarged image"
+  >
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="m15 18-6-6 6-6"></path>
+    </svg>
+  </button>
+
+  <button
+    class="project-lightbox-arrow project-lightbox-arrow-next"
+    type="button"
+    data-project-lightbox-next
+    aria-label="Show next enlarged image"
+  >
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="m9 18 6-6-6-6"></path>
+    </svg>
+  </button>
+
+  <figure class="project-lightbox-content">
+    <img
+      src=""
+      alt=""
+      data-project-lightbox-image
+    />
+
+    <figcaption
+      data-project-lightbox-caption
+      hidden
+    ></figcaption>
+  </figure>
+</dialog>
+
+{
+  project.learnings &&
+    project.learnings.length > 0 && (
+      <section class="learning-section section-pad">
+        <div class="shell learning-stack">
+          <div class="learning-heading">
+            <p class="eyebrow">Reflection</p>
+            <h2>What I learned</h2>
+          </div>
+
+          <ol class="learning-list">
+            {
+              project.learnings.map((learning) => (
+                <li>{learning}</li>
+              ))
+            }
+          </ol>
+        </div>
+      </section>
+    )
+}
+
+    <nav
+      class="next-project shell"
+      aria-label="Next project"
+    >
+      <span>Next project</span>
+
+      <a href={`/projects/${nextProject.slug}/`}>
+        <strong>{nextProject.title}</strong>
+        <span aria-hidden="true">→</span>
+      </a>
+    </nav>
+
+    <nav
+      class="next-project previous-project shell"
+      aria-label="Previous project"
+    >
+      <span>Previous project</span>
+
+      <a href={`/projects/${previousProject.slug}/`}>
+        <strong>{previousProject.title}</strong>
+        <span aria-hidden="true">←</span>
+      </a>
+    </nav>
+
+    <div class="all-projects-action shell">
+  <a href="/projects/" class="all-projects-link">
+    See all projects
+    <span aria-hidden="true">→</span>
+  </a>
+</div>
+  </article>
+</BaseLayout>
+
+
+<script>
+  const setupProjectGalleries = () => {
+    const galleries =
+      document.querySelectorAll<HTMLElement>(
+        '[data-project-gallery]'
+      );
+
+    galleries.forEach((gallery) => {
+      if (gallery.dataset.galleryReady === 'true') {
+        return;
+      }
+
+      gallery.dataset.galleryReady = 'true';
+
+      const slides = Array.from(
+        gallery.querySelectorAll<HTMLElement>(
+          '[data-gallery-slide]'
+        )
+      );
+
+      const thumbnails = Array.from(
+        gallery.querySelectorAll<HTMLButtonElement>(
+          '[data-gallery-thumbnail]'
+        )
+      );
+
+      const previousButton =
+        gallery.querySelector<HTMLButtonElement>(
+          '[data-gallery-previous]'
+        );
+
+      const nextButton =
+        gallery.querySelector<HTMLButtonElement>(
+          '[data-gallery-next]'
+        );
+
+      const currentNumber =
+        gallery.querySelector<HTMLElement>(
+          '[data-gallery-current]'
+        );
+
+      if (slides.length === 0) {
+        return;
+      }
+
+      let currentIndex = 0;
+
+      const showImage = (requestedIndex: number) => {
+        currentIndex =
+          (requestedIndex + slides.length) %
+          slides.length;
+
+        slides.forEach((slide, index) => {
+          const isActive = index === currentIndex;
+
+          slide.hidden = !isActive;
+          slide.classList.toggle(
+            'is-active',
+            isActive
+          );
+
+          slide.setAttribute(
+            'aria-hidden',
+            String(!isActive)
+          );
+        });
+
+        thumbnails.forEach((thumbnail, index) => {
+          const isActive = index === currentIndex;
+
+          thumbnail.classList.toggle(
+            'is-active',
+            isActive
+          );
+
+          if (isActive) {
+            thumbnail.setAttribute(
+              'aria-current',
+              'true'
+            );
+          } else {
+            thumbnail.removeAttribute(
+              'aria-current'
+            );
+          }
+        });
+
+        if (currentNumber) {
+          currentNumber.textContent =
+            String(currentIndex + 1);
+        }
+      };
+
+      previousButton?.addEventListener(
+        'click',
+        () => {
+          showImage(currentIndex - 1);
+        }
+      );
+
+      nextButton?.addEventListener(
+        'click',
+        () => {
+          showImage(currentIndex + 1);
+        }
+      );
+
+      thumbnails.forEach((thumbnail) => {
+        thumbnail.addEventListener('click', () => {
+          const index = Number(
+            thumbnail.dataset.galleryIndex
+          );
+
+          if (Number.isFinite(index)) {
+            showImage(index);
+          }
+        });
+      });
+
+      gallery.addEventListener(
+        'keydown',
+        (event) => {
+          if (event.key === 'ArrowLeft') {
+            showImage(currentIndex - 1);
+          }
+
+          if (event.key === 'ArrowRight') {
+            showImage(currentIndex + 1);
+          }
+        }
+      );
+
+      showImage(0);
+    });
+  };
+
+  const setupProjectLightbox = () => {
+  const dialog =
+    document.querySelector<HTMLDialogElement>(
+      '[data-project-lightbox]'
+    );
+
+  if (
+    !dialog ||
+    dialog.dataset.lightboxReady === 'true'
+  ) {
+    return;
+  }
+
+  dialog.dataset.lightboxReady = 'true';
+
+  const largeImage =
+    dialog.querySelector<HTMLImageElement>(
+      '[data-project-lightbox-image]'
+    );
+
+  const largeCaption =
+    dialog.querySelector<HTMLElement>(
+      '[data-project-lightbox-caption]'
+    );
+
+  const closeButton =
+    dialog.querySelector<HTMLButtonElement>(
+      '[data-project-lightbox-close]'
+    );
+
+  const previousButton =
+    dialog.querySelector<HTMLButtonElement>(
+      '[data-project-lightbox-previous]'
+    );
+
+  const nextButton =
+    dialog.querySelector<HTMLButtonElement>(
+      '[data-project-lightbox-next]'
+    );
+
+  const zoomButtons = Array.from(
+    document.querySelectorAll<HTMLButtonElement>(
+      '[data-gallery-zoom]'
+    )
+  );
+
+  if (!largeImage || zoomButtons.length === 0) {
+    return;
+  }
+
+  let currentIndex = 0;
+
+  const showLightboxImage = (
+    requestedIndex: number
+  ) => {
+    currentIndex =
+      (requestedIndex + zoomButtons.length) %
+      zoomButtons.length;
+
+    const selectedButton =
+      zoomButtons[currentIndex];
+
+    const sourceImage =
+      selectedButton.querySelector<HTMLImageElement>(
+        'img'
+      );
+
+    if (!sourceImage) {
+      return;
+    }
+
+    largeImage.src =
+      sourceImage.currentSrc || sourceImage.src;
+
+    largeImage.alt = sourceImage.alt;
+
+    const captionText =
+      selectedButton
+        .closest('figure')
+        ?.querySelector('figcaption')
+        ?.textContent
+        ?.trim() ?? '';
+
+    if (largeCaption) {
+      largeCaption.textContent = captionText;
+      largeCaption.hidden = !captionText;
+    }
+
+    /* Restart the 0.2-second image animation */
+    largeImage.classList.remove('is-changing');
+    void largeImage.offsetWidth;
+    largeImage.classList.add('is-changing');
+  };
+
+  zoomButtons.forEach((button, index) => {
+    button.addEventListener('click', () => {
+      showLightboxImage(index);
+      dialog.showModal();
+    });
+  });
+
+  previousButton?.addEventListener(
+    'click',
+    () => {
+      showLightboxImage(currentIndex - 1);
+    }
+  );
+
+  nextButton?.addEventListener(
+    'click',
+    () => {
+      showLightboxImage(currentIndex + 1);
+    }
+  );
+
+  closeButton?.addEventListener('click', () => {
+    dialog.close();
+  });
+
+  dialog.addEventListener('keydown', (event) => {
+    if (event.key === 'ArrowLeft') {
+      showLightboxImage(currentIndex - 1);
+    }
+
+    if (event.key === 'ArrowRight') {
+      showLightboxImage(currentIndex + 1);
+    }
+  });
+
+  dialog.addEventListener('click', (event) => {
+    if (event.target === dialog) {
+      dialog.close();
+    }
+  });
+
+  dialog.addEventListener('close', () => {
+    largeImage.src = '';
+    largeImage.alt = '';
+    largeImage.classList.remove('is-changing');
+  });
+
+  const hasMultipleImages =
+    zoomButtons.length > 1;
+
+  if (previousButton) {
+    previousButton.hidden = !hasMultipleImages;
+  }
+
+  if (nextButton) {
+    nextButton.hidden = !hasMultipleImages;
+  }
+};
+
+  setupProjectGalleries();
+  setupProjectLightbox();
+
+  document.addEventListener(
+    'astro:page-load',
+    () => {
+      setupProjectGalleries();
+      setupProjectLightbox();
+    }
+  );
+</script>

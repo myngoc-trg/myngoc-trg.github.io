@@ -1,0 +1,421 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import ProjectCard from '../components/ProjectCard.astro';
+import SectionHeading from '../components/SectionHeading.astro';
+import { featuredProjects, smallerProjects } from '../data/projects';
+import { funFacts, site, skills } from '../data/site';
+---
+
+<BaseLayout>
+  <section class="home-showcase">
+  <div class="home-hero">
+    <div
+      class="home-showcase-art"
+      aria-hidden="true"
+    >
+      <span>μ</span>
+      <span>42</span>
+      <span>ŷ</span>
+    </div>
+
+    <div class="shell-wide home-showcase-inner">
+      <div class="intro-card">
+        <div class="intro-copy">
+          <p class="eyebrow">
+            Mathematical statistics · Data science · Sweden
+          </p>
+
+          <h1>Nancy Truong</h1>
+
+          <p class="intro-lead">
+            I am a data scientist with a degree in
+            Mathematical Statistics. I enjoy turning complex
+            data into reliable models and analytical tools
+            that provide clarity to support important
+            decision-making.
+          </p>
+
+          <ul
+            class="skill-tiles"
+            aria-label="Core skills"
+          >
+            {
+              skills.map((skill) => (
+                <li
+                  style={`--skill-color: ${skill.color}`}
+                >
+                  {skill.label}
+                </li>
+              ))
+            }
+          </ul>
+
+          <div class="button-row">
+            <a
+              class="button button-primary"
+              href="#selected-work"
+            >
+              View selected work
+            </a>
+
+            <a
+              class="button button-secondary"
+              href="/contact/"
+            >
+              Connect with me
+            </a>
+          </div>
+        </div>
+
+        <figure class="intro-portrait">
+          <img
+            src="/images/nancy-profile.webp"
+            alt="Nancy Truong"
+            width="1200"
+            height="1600"
+            fetchpriority="high"
+          />
+        </figure>
+      </div>
+    </div>
+  </div>
+
+  <div class="shell-wide">
+    <div
+      id="selected-work"
+      class="selected-work"
+    >
+      <div class="section-heading-row">
+        <SectionHeading
+          eyebrow="Study and work"
+          title="Selected projects"
+        />
+
+        <a
+          class="text-link"
+          href="/projects/"
+        >
+          See all projects
+          <span aria-hidden="true">→</span>
+        </a>
+      </div>
+
+      <div class="project-grid featured-grid">
+        {
+          featuredProjects.map((project) => (
+            <ProjectCard project={project} />
+          ))
+        }
+      </div>
+    </div>
+  </div>
+</section>
+
+ <section
+  class="exploration-band"
+  aria-labelledby="exploration-title"
+>
+  <div class="shell exploration-heading">
+    <div>
+      <p class="eyebrow">Other explorations</p>
+
+      <h2 id="exploration-title">
+      </h2>
+
+
+    </div>
+  </div>
+
+  <div class="shell-wide">
+    <div
+      class="project-carousel"
+      aria-label="Smaller projects"
+    >
+      <div class="project-carousel-track">
+        <!-- Visible project group -->
+        <div class="project-carousel-group">
+          {
+            smallerProjects.map((project) => (
+              <ProjectCard
+                project={project}
+                compact
+              />
+            ))
+          }
+        </div>
+
+        <!--
+          Duplicate group creates the continuous loop.
+          It is hidden from screen readers and keyboard navigation.
+        -->
+        <div
+          class="project-carousel-group project-carousel-group-clone"
+          aria-hidden="true"
+        >
+          {
+            smallerProjects.map((project) => (
+              <ProjectCard
+                project={project}
+                compact
+              />
+            ))
+          }
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+  <section class="contact-band section-pad">
+  <div class="shell contact-band-stack">
+    <div class="contact-band-inner">
+      <div>
+        <p class="eyebrow">Let’s connect</p>
+
+        <h2>
+          Whether it’s a talk invitation, a question, or a fun idea about data, statistics, or machine learning, I’d love to hear from you!
+
+        </h2>
+
+      </div>
+
+      <div class="button-row">
+        <a
+          class="button button-primary"
+          href="/contact/"
+        >
+          Connect with me
+        </a>
+
+        <a
+          class="button button-secondary"
+          href={site.links.github}
+          target="_blank"
+          rel="noreferrer"
+        >
+          View GitHub
+        </a>
+      </div>
+    </div>
+
+    <details
+      class="fun-facts-disclosure contact-fun-facts"
+      data-fun-facts
+    >
+      <summary data-fun-facts-summary>
+        <span
+          class="fun-facts-toggle"
+          aria-hidden="true"
+        ></span>
+
+        <span id="fun-facts-title">
+          Fun facts
+        </span>
+      </summary>
+
+      <div class="fun-facts-panel"
+      data-fun-facts-panel>
+        <ul class="fun-facts-list">
+          {
+            funFacts.map((fact) => (
+              <li>{fact}</li>
+            ))
+          }
+        </ul>
+      </div>
+    </details>
+  </div>
+</section>
+</BaseLayout>
+
+<script>
+  const prepareCarouselClones = () => {
+    const clonedControls = document.querySelectorAll(
+      '.project-carousel-group-clone a, ' +
+      '.project-carousel-group-clone button, ' +
+      '.project-carousel-group-clone input, ' +
+      '.project-carousel-group-clone select, ' +
+      '.project-carousel-group-clone textarea'
+    );
+
+    clonedControls.forEach((control) => {
+      control.setAttribute('tabindex', '-1');
+    });
+  };
+
+  prepareCarouselClones();
+
+  document.addEventListener(
+    'astro:page-load',
+    prepareCarouselClones
+  );
+</script>
+
+
+<script>
+  const setupFunFactsAnimation = () => {
+    const disclosures =
+      document.querySelectorAll<HTMLDetailsElement>(
+        '[data-fun-facts]'
+      );
+
+    disclosures.forEach((details) => {
+      if (
+        details.dataset.animationReady === 'true'
+      ) {
+        return;
+      }
+
+      details.dataset.animationReady = 'true';
+
+      const summary =
+        details.querySelector<HTMLElement>(
+          '[data-fun-facts-summary]'
+        );
+
+      const panel =
+        details.querySelector<HTMLElement>(
+          '[data-fun-facts-panel]'
+        );
+
+      if (!summary || !panel) {
+        return;
+      }
+
+      let isAnimating = false;
+
+      const prefersReducedMotion =
+        window.matchMedia(
+          '(prefers-reduced-motion: reduce)'
+        ).matches;
+
+      const finishOpening = () => {
+        panel.style.height = 'auto';
+        panel.style.opacity = '1';
+        panel.style.transform = 'translateY(0)';
+        isAnimating = false;
+      };
+
+      const finishClosing = () => {
+        details.open = false;
+
+        panel.style.height = '';
+        panel.style.opacity = '';
+        panel.style.transform = '';
+
+        isAnimating = false;
+      };
+
+      summary.addEventListener('click', (event) => {
+        event.preventDefault();
+
+        if (isAnimating) {
+          return;
+        }
+
+        if (prefersReducedMotion) {
+          details.open = !details.open;
+          return;
+        }
+
+        isAnimating = true;
+
+        if (!details.open) {
+          /*
+            Open the native details element first so its
+            content can be measured.
+          */
+          details.open = true;
+
+          panel.style.height = '0px';
+          panel.style.opacity = '0';
+          panel.style.transform =
+            'translateY(-8px)';
+
+          /*
+            Force the browser to register the initial state.
+          */
+          panel.getBoundingClientRect();
+
+          panel.style.height =
+            `${panel.scrollHeight}px`;
+
+          panel.style.opacity = '1';
+          panel.style.transform =
+            'translateY(0)';
+
+          const handleOpenEnd = (
+            transitionEvent: TransitionEvent
+          ) => {
+            if (
+              transitionEvent.propertyName !== 'height'
+            ) {
+              return;
+            }
+
+            panel.removeEventListener(
+              'transitionend',
+              handleOpenEnd
+            );
+
+            finishOpening();
+          };
+
+          panel.addEventListener(
+            'transitionend',
+            handleOpenEnd
+          );
+        } else {
+          /*
+            Convert height:auto into a pixel value before
+            animating it down to zero.
+          */
+          panel.style.height =
+            `${panel.scrollHeight}px`;
+
+          panel.style.opacity = '1';
+          panel.style.transform =
+            'translateY(0)';
+
+          panel.getBoundingClientRect();
+
+          panel.style.height = '0px';
+          panel.style.opacity = '0';
+          panel.style.transform =
+            'translateY(-8px)';
+
+          const handleCloseEnd = (
+            transitionEvent: TransitionEvent
+          ) => {
+            if (
+              transitionEvent.propertyName !== 'height'
+            ) {
+              return;
+            }
+
+            panel.removeEventListener(
+              'transitionend',
+              handleCloseEnd
+            );
+
+            finishClosing();
+          };
+
+          panel.addEventListener(
+            'transitionend',
+            handleCloseEnd
+          );
+        }
+      });
+    });
+  };
+
+  setupFunFactsAnimation();
+
+  document.addEventListener(
+    'astro:page-load',
+    setupFunFactsAnimation
+  );
+</script>
+
+

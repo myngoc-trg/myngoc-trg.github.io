@@ -1,0 +1,443 @@
+---
+import { dropdownProjects } from '../data/projects';
+import { site } from '../data/site';
+
+const currentPath = Astro.url.pathname;
+const isHome = currentPath === '/';
+const isProjects = currentPath.startsWith('/projects/');
+const headerKindLabels = {
+  Work: 'FinTech',
+  Study: 'MLStats',
+} as const;
+---
+
+<header class="site-header" data-site-header>
+  <div class="shell header-inner">
+    <a
+      class="brand"
+      href="/"
+      aria-label="Nancy Truong home"
+    >
+      <span class="brand-mark" aria-hidden="true">
+        NT
+      </span>
+
+      <span class="brand-name">
+        Nancy Truong
+      </span>
+    </a>
+
+    <nav
+      id="primary-navigation"
+      class="primary-nav"
+      aria-label="Primary navigation"
+    >
+      <a
+        class:list={[
+          'nav-link',
+          { active: isHome },
+        ]}
+        href="/"
+        aria-current={isHome ? 'page' : undefined}
+      >
+        Home
+      </a>
+
+<div
+  class:list={[
+    'nav-projects',
+    { active: isProjects },
+  ]}
+  data-project-menu
+>
+  <div class="nav-projects-control">
+    <a
+      class="project-menu-link"
+      href="/projects/"
+      aria-current={isProjects ? 'page' : undefined}
+    >
+      Projects
+    </a>
+
+    <button
+      class="project-menu-toggle"
+      type="button"
+      aria-expanded="false"
+      aria-haspopup="true"
+      aria-controls="projects-dropdown"
+      aria-label="Show project menu"
+    >
+      <svg
+        viewBox="0 0 16 16"
+        aria-hidden="true"
+      >
+        <path d="m4 6 4 4 4-4"></path>
+      </svg>
+    </button>
+  </div>
+
+  <div
+    id="projects-dropdown"
+    class="project-menu"
+    role="menu"
+  >
+    <a
+      class="project-menu-all"
+      href="/projects/"
+      role="menuitem"
+    >
+      <span>See all projects</span>
+      <span aria-hidden="true">→</span>
+    </a>
+
+    <div class="project-menu-list">
+      {
+        dropdownProjects.map((project) => (
+          <a
+            href={`/projects/${project.slug}/`}
+            role="menuitem"
+          >
+            <span class="project-menu-kind">
+            {
+              headerKindLabels[
+                project.kind as keyof typeof headerKindLabels
+              ] ?? project.kind
+            }
+          </span>
+
+            <span class="project-menu-title">
+              {project.title}
+            </span>
+          </a>
+        ))
+      }
+    </div>
+  </div>
+</div>
+
+          <a
+      class:list={[
+        'nav-link',
+        { active: currentPath.startsWith('/contact/') },
+      ]}
+      href="/contact/"
+      aria-current={
+        currentPath.startsWith('/contact/')
+          ? 'page'
+          : undefined
+      }
+    >
+      Contact
+    </a>
+
+    </nav>
+
+    <div class="header-controls">
+      <!-- Dark and light theme button -->
+      <button
+        class="theme-toggle"
+        type="button"
+        data-theme-toggle
+        aria-label="Switch to light mode"
+        title="Switch to light mode"
+      >
+        <!-- Sun: displayed while dark mode is active -->
+        <svg
+          class="theme-icon theme-icon-sun"
+          viewBox="0 0 24 24"
+          aria-hidden="true"
+        >
+          <circle cx="12" cy="12" r="4"></circle>
+          <path d="M12 2v2"></path>
+          <path d="M12 20v2"></path>
+          <path d="m4.93 4.93 1.42 1.42"></path>
+          <path d="m17.66 17.66 1.41 1.41"></path>
+          <path d="M2 12h2"></path>
+          <path d="M20 12h2"></path>
+          <path d="m6.34 17.66-1.41 1.41"></path>
+          <path d="m19.07 4.93-1.41 1.42"></path>
+        </svg>
+
+        <!-- Moon: displayed while light mode is active -->
+        <svg
+          class="theme-icon theme-icon-moon"
+          viewBox="0 0 24 24"
+          aria-hidden="true"
+        >
+          <path
+            d="M21 12.79A9 9 0 1 1 11.21 3
+               7 7 0 0 0 21 12.79Z"
+          ></path>
+        </svg>
+
+        <span class="sr-only">
+          Change colour theme
+        </span>
+      </button>
+
+      <!-- Mobile navigation button -->
+      <button
+        class="menu-toggle"
+        type="button"
+        aria-expanded="false"
+        aria-controls="primary-navigation"
+        aria-label="Open navigation"
+      >
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </div>
+  </div>
+</header>
+
+<script>
+  type Theme = 'light' | 'dark';
+
+  type PortfolioWindow = Window & {
+    __nancyHeaderController?: AbortController;
+  };
+
+  const storageKey = 'nancy-portfolio-theme';
+
+  const setupHeader = () => {
+    const portfolioWindow = window as PortfolioWindow;
+
+    /*
+      Remove listeners belonging to the previous page/header,
+      then create fresh listeners for the current header.
+    */
+    portfolioWindow.__nancyHeaderController?.abort();
+
+    const controller = new AbortController();
+    const { signal } = controller;
+
+    portfolioWindow.__nancyHeaderController = controller;
+
+    const root = document.documentElement;
+
+    const header = document.querySelector(
+      '[data-site-header]'
+    );
+
+    const menuToggle = document.querySelector(
+      '.menu-toggle'
+    );
+
+    const nav = document.querySelector(
+      '#primary-navigation'
+    );
+
+    const projectRoot = document.querySelector(
+      '[data-project-menu]'
+    );
+
+    const projectToggle = document.querySelector(
+      '.project-menu-toggle'
+    );
+
+    const themeToggle = document.querySelector(
+      '[data-theme-toggle]'
+    );
+
+    const themeColour = document.querySelector(
+      '[data-theme-color]'
+    );
+
+    const getCurrentTheme = (): Theme =>
+      root.dataset.theme === 'light'
+        ? 'light'
+        : 'dark';
+
+    const updateThemeButton = () => {
+      if (!(themeToggle instanceof HTMLButtonElement)) {
+        return;
+      }
+
+      const currentTheme = getCurrentTheme();
+
+      const nextTheme =
+        currentTheme === 'dark'
+          ? 'light'
+          : 'dark';
+
+      const label = `Switch to ${nextTheme} mode`;
+
+      themeToggle.setAttribute(
+        'aria-label',
+        label
+      );
+
+      themeToggle.setAttribute(
+        'title',
+        label
+      );
+    };
+
+    const applyTheme = (
+      theme: Theme,
+      saveChoice = true
+    ) => {
+      root.dataset.theme = theme;
+      root.style.colorScheme = theme;
+
+      if (saveChoice) {
+        try {
+          localStorage.setItem(
+            storageKey,
+            theme
+          );
+        } catch {
+          // The theme still changes if storage is unavailable.
+        }
+      }
+
+      if (themeColour instanceof HTMLMetaElement) {
+        themeColour.content =
+          theme === 'light'
+            ? '#f3f1eb'
+            : '#0b1114';
+      }
+
+      updateThemeButton();
+    };
+
+    updateThemeButton();
+
+    themeToggle?.addEventListener(
+      'click',
+      () => {
+        const currentTheme = getCurrentTheme();
+
+        applyTheme(
+          currentTheme === 'dark'
+            ? 'light'
+            : 'dark'
+        );
+      },
+      { signal }
+    );
+
+    const closeProjectMenu = () => {
+      projectRoot?.classList.remove('is-open');
+
+      projectToggle?.setAttribute(
+        'aria-expanded',
+        'false'
+      );
+    };
+
+    menuToggle?.addEventListener(
+      'click',
+      () => {
+        const open =
+          menuToggle.getAttribute(
+            'aria-expanded'
+          ) === 'true';
+
+        menuToggle.setAttribute(
+          'aria-expanded',
+          String(!open)
+        );
+
+        menuToggle.setAttribute(
+          'aria-label',
+          open
+            ? 'Open navigation'
+            : 'Close navigation'
+        );
+
+        nav?.classList.toggle(
+          'is-open',
+          !open
+        );
+      },
+      { signal }
+    );
+
+    projectToggle?.addEventListener(
+      'click',
+      (event) => {
+        event.stopPropagation();
+
+        const open =
+          projectRoot?.classList.toggle(
+            'is-open'
+          ) ?? false;
+
+        projectToggle.setAttribute(
+          'aria-expanded',
+          String(open)
+        );
+      },
+      { signal }
+    );
+
+    document.addEventListener(
+      'click',
+      (event) => {
+        if (
+          projectRoot &&
+          !projectRoot.contains(
+            event.target as Node
+          )
+        ) {
+          closeProjectMenu();
+        }
+      },
+      { signal }
+    );
+
+    document.addEventListener(
+      'keydown',
+      (event) => {
+        if (event.key !== 'Escape') {
+          return;
+        }
+
+        closeProjectMenu();
+
+        nav?.classList.remove('is-open');
+
+        menuToggle?.setAttribute(
+          'aria-expanded',
+          'false'
+        );
+
+        menuToggle?.setAttribute(
+          'aria-label',
+          'Open navigation'
+        );
+      },
+      { signal }
+    );
+
+    const updateHeader = () => {
+      header?.classList.toggle(
+        'is-scrolled',
+        window.scrollY > 8
+      );
+    };
+
+    updateHeader();
+
+    window.addEventListener(
+      'scroll',
+      updateHeader,
+      {
+        passive: true,
+        signal,
+      }
+    );
+  };
+
+  setupHeader();
+
+  /*
+    Reconnect all controls after Astro client-side navigation.
+  */
+  document.addEventListener(
+    'astro:page-load',
+    setupHeader
+  );
+</script>
