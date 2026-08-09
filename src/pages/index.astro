@@ -230,11 +230,11 @@ import { funFacts, site, skills } from '../data/site';
 <script>
   const setupMobileProjectCarousel = () => {
     const firstGroup =
-      document.querySelector<HTMLElement>(
+      document.querySelector(
         '.project-carousel-group:not(.project-carousel-group-clone)'
       );
 
-    if (!firstGroup) {
+    if (!(firstGroup instanceof HTMLElement)) {
       return;
     }
 
@@ -248,60 +248,42 @@ import { funFacts, site, skills } from '../data/site';
     firstGroup.dataset.mobileLoopReady =
       'true';
 
-    /*
-      Use this version for phones in both
-      portrait and landscape.
-    */
     const mobileQuery =
       window.matchMedia(
         '(max-width: 900px)'
       );
 
-    /*
-      Remember the original order so the
-      desktop carousel can be restored.
-    */
     const originalCards =
       Array.from(firstGroup.children);
 
+    /*
+      About 38 px/second.
+
+      Importantly, we do NOT translate the
+      carousel/group at all.
+    */
+    const speed = 0.038;
+    const gap = 12;
+
     let offset = 0;
     let previousTime = performance.now();
-    let pixelsPerMillisecond = 0;
-    let gap = 12;
     let wasMobile = false;
-
-    const updateMetrics = () => {
-      const styles =
-        window.getComputedStyle(firstGroup);
-
-      const parsedGap =
-        parseFloat(styles.columnGap);
-
-      gap =
-        Number.isFinite(parsedGap)
-          ? parsedGap
-          : 12;
-
-      /*
-        Keep approximately the same 70-second
-        speed as the desktop carousel.
-      */
-      pixelsPerMillisecond =
-        firstGroup.scrollWidth / 70000;
-    };
 
     const restoreOriginalOrder = () => {
       originalCards.forEach((card) => {
+        if (card instanceof HTMLElement) {
+          card.style.marginLeft = '';
+        }
+
         firstGroup.appendChild(card);
       });
 
       offset = 0;
-      firstGroup.style.transform = '';
     };
 
     const animate = (
-      currentTime: number
-    ) => {
+  currentTime: number
+) => {
       const elapsed =
         Math.min(
           currentTime - previousTime,
@@ -313,45 +295,52 @@ import { funFacts, site, skills } from '../data/site';
       if (mobileQuery.matches) {
         if (!wasMobile) {
           restoreOriginalOrder();
-          updateMetrics();
           wasMobile = true;
         }
 
-        offset +=
-          pixelsPerMillisecond *
-          elapsed;
-
         const firstCard =
-          firstGroup.firstElementChild as
-            HTMLElement | null;
+          firstGroup.firstElementChild;
 
-        if (firstCard) {
+        if (firstCard instanceof HTMLElement) {
+          offset += speed * elapsed;
+
           const cardStep =
-            firstCard.getBoundingClientRect()
-              .width + gap;
+            firstCard.offsetWidth + gap;
 
-          /*
-            As soon as one card has completely
-            moved off the left side, move that
-            exact DOM element to the end.
-
-            The carousel therefore never reaches
-            an empty area.
-          */
           if (
             cardStep > 0 &&
             offset >= cardStep
           ) {
             offset -= cardStep;
 
+            /*
+              Reset the card before moving it
+              to the back of the row.
+            */
+            firstCard.style.marginLeft = '';
+
             firstGroup.appendChild(
               firstCard
             );
           }
-        }
 
-        firstGroup.style.transform =
-          `translate3d(${-offset}px, 0, 0)`;
+          const currentFirstCard =
+            firstGroup.firstElementChild;
+
+          if (
+            currentFirstCard instanceof HTMLElement
+          ) {
+            /*
+              Only the FIRST CARD moves.
+
+              No translate3d.
+              No transformed parent.
+              No scrollLeft.
+            */
+            currentFirstCard.style.marginLeft =
+              `-${offset}px`;
+          }
+        }
       } else if (wasMobile) {
         restoreOriginalOrder();
         wasMobile = false;

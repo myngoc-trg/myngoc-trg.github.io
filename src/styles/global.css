@@ -4196,30 +4196,42 @@ main {
 
 /* ========================================
    FINAL mobile carousel
-   Card-recycling version
-   Keep this at the bottom of the file
+   Safari-safe layout animation
+   Keep this LAST in global.css
    ======================================== */
 
 @media (max-width: 900px) {
   .project-carousel {
     overflow: hidden;
     clip-path: none;
+    isolation: auto;
+  }
+
+  /*
+    Remove the composited fade layers on
+    mobile while fixing Safari.
+  */
+  .project-carousel::before,
+  .project-carousel::after {
+    display: none;
   }
 
   .project-carousel-track {
     display: flex;
     width: max-content;
-    transform: none;
+
+    transform: none !important;
     will-change: auto;
   }
 
-  /*
-    CSS animation is completely disabled
-    on mobile. JavaScript controls only
-    the original group.
-  */
   .project-carousel-group {
-    animation: none;
+    animation: none !important;
+
+    transform: none !important;
+    will-change: auto;
+
+    backface-visibility: visible;
+    -webkit-backface-visibility: visible;
   }
 
   .project-carousel-group:not(
@@ -4230,18 +4242,15 @@ main {
 
     gap: 12px;
     padding-right: 0;
-
-    transform: translate3d(0, 0, 0);
-    will-change: transform;
   }
 
   /*
-    Mobile does not need the duplicate group.
-    Cards from the original group are recycled
-    continuously instead.
+    Mobile only needs one set of cards.
+    JavaScript moves the first card to the
+    back continuously.
   */
   .project-carousel-group-clone {
-    display: none;
+    display: none !important;
   }
 
   .project-carousel
