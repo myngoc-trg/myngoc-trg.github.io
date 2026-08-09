@@ -4281,3 +4281,20 @@ main {
     scroll-snap-align: none;
   }
 }
+
+@media (max-width: 900px) {
+  .project-carousel .project-card-badges {
+    flex-wrap: nowrap;
+    gap: 5px;
+    right: 8px;
+    left: 8px;
+  }
+
+  .project-carousel .project-card-badges span {
+    padding: 4px 6px;
+    font-size: 0.5rem;
+    line-height: 1.15;
+    letter-spacing: 0.02em;
+    white-space: nowrap;
+  }
+}
