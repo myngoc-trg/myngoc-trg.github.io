@@ -406,6 +406,45 @@ const galleryImages =
         )
       );
 
+      const stage =
+        gallery.querySelector<HTMLElement>(
+          '.project-gallery-stage'
+        );
+
+      const galleryImages = Array.from(
+        gallery.querySelectorAll<HTMLImageElement>(
+          '[data-gallery-slide] img'
+        )
+      );
+
+      const getImageDimensions = (
+        image: HTMLImageElement
+      ): Promise<{ width: number; height: number } | null> => {
+        if (image.naturalWidth && image.naturalHeight) {
+          return Promise.resolve({
+            width: image.naturalWidth,
+            height: image.naturalHeight,
+          });
+        }
+
+        return new Promise((resolve) => {
+          const preload = new Image();
+
+          preload.onload = () => {
+            resolve({
+              width: preload.naturalWidth,
+              height: preload.naturalHeight,
+            });
+          };
+
+          preload.onerror = () => resolve(null);
+
+          preload.src =
+            image.currentSrc ||
+            image.src;
+        });
+      };
+
       const thumbnails = Array.from(
         gallery.querySelectorAll<HTMLButtonElement>(
           '[data-gallery-thumbnail]'
@@ -430,6 +469,88 @@ const galleryImages =
       if (slides.length === 0) {
         return;
       }
+
+      if (stage && galleryImages.length > 0) {
+  Promise.all(
+    galleryImages.map(getImageDimensions)
+  ).then((dimensions) => {
+    const validDimensions =
+      dimensions.filter(
+        (
+          item
+        ): item is {
+          width: number;
+          height: number;
+        } =>
+          item !== null &&
+          item.width > 0 &&
+          item.height > 0
+      );
+
+    if (validDimensions.length === 0) {
+      return;
+    }
+
+    const updateGalleryHeight = () => {
+      const stageStyles =
+        getComputedStyle(stage);
+
+        const horizontalPadding =
+          parseFloat(stageStyles.paddingLeft) +
+          parseFloat(stageStyles.paddingRight);
+
+        const verticalPadding =
+          parseFloat(stageStyles.paddingTop) +
+          parseFloat(stageStyles.paddingBottom);
+
+        const availableWidth = Math.max(
+          0,
+          stage.clientWidth - horizontalPadding
+        );
+
+        const tallestImageHeight = Math.max(
+          ...validDimensions.map(
+            ({ width, height }) =>
+              availableWidth *
+              (height / width)
+          )
+        );
+
+        /*
+          Leave room for the caption underneath
+          the image when a gallery image has one.
+        */
+        const hasCaption = slides.some(
+          (slide) =>
+            slide.querySelector('figcaption')
+        );
+
+        const captionSpace =
+          hasCaption ? 52 : 0;
+
+        const calculatedHeight = Math.max(
+          600,
+          tallestImageHeight +
+            captionSpace +
+            verticalPadding
+        );
+
+        stage.style.setProperty(
+          '--gallery-stage-height',
+          `${Math.ceil(calculatedHeight)}px`
+        );
+      };
+
+      updateGalleryHeight();
+
+      const resizeObserver =
+        new ResizeObserver(
+          updateGalleryHeight
+        );
+
+      resizeObserver.observe(stage);
+    });
+  }
 
       let currentIndex = 0;
 

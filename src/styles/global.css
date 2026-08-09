@@ -57,6 +57,8 @@
     Baskerville,
     "Times New Roman",
     serif;
+
+  --carousel-background: var(--bg-soft);
 }
 
 html[data-theme="light"] {
@@ -1220,13 +1222,12 @@ html[data-theme="light"] .project-card-link {
   margin-block: -42px;
   padding-block: 110px;
   isolation: isolate;
-  /*
-    Clip the cards at the left and right edges,
-    but allow shadows above and below.
-  */
-  clip-path: inset(-120px -1px -120px -1px);
+
+  /* Clean horizontal clipping, but keep room for enlarged cards vertically */
+  clip-path: inset(-120px 0 -120px 0);
 }
 
+/* Soft fade at both ends of the carousel */
 /* Soft fade at both ends of the carousel */
 
 .project-carousel::before,
@@ -1238,38 +1239,38 @@ html[data-theme="light"] .project-card-link {
   width: clamp(30px, 6vw, 90px);
   content: "";
   pointer-events: none;
-
   opacity: 1;
-  transition: opacity 220ms ease;
+
+  transform: translateZ(0);
+  backface-visibility: hidden;
 }
 
+/* Left fade — overlap slightly to hide the seam */
+
 .project-carousel::before {
-  left: -1px;
+  left: -3px;
+  width: calc(clamp(30px, 6vw, 90px) + 3px);
+
   background: linear-gradient(
     90deg,
     var(--carousel-background) 0%,
-    var(--carousel-background) 8%,
+    var(--carousel-background) 18%,
     transparent 100%
   );
 }
 
+/* Right fade */
+
 .project-carousel::after {
-  right: -1px;
+  right: 0;
+
   background: linear-gradient(
     270deg,
     var(--carousel-background) 0%,
-    var(--carousel-background) 8%,
+    var(--carousel-background) 18%,
     transparent 100%
   );
 }
-
-.project-carousel:hover::before,
-.project-carousel:hover::after,
-.project-carousel:focus-within::before,
-.project-carousel:focus-within::after {
-  opacity: 0;
-}
-
 /*
   Both identical project groups sit beside each other.
   Translating the combined track by 50% creates the loop.
@@ -1361,7 +1362,12 @@ html[data-theme="light"] .project-card-link {
 .project-gallery-stage {
   display: grid;
   width: 100%;
-  height: 700px;
+
+  /* JS calculates this from the tallest image
+     in this project's gallery */
+  height: var(--gallery-stage-height, 600px);
+  min-height: 600px;
+
   place-items: center;
   padding: clamp(14px, 2.4vw, 0px);
   background: var(--surface-2);
@@ -1549,7 +1555,7 @@ html[data-theme="light"] .project-gallery-thumbnail {
 
 @media (max-width: 560px) {
   .project-gallery-stage {
-    aspect-ratio: 4 / 3;
+    aspect-ratio: auto;
     padding: 10px;
   }
 
@@ -1655,10 +1661,7 @@ html[data-theme="light"] .project-gallery-thumbnail {
     padding-block: 58px;
   }
 
-  .project-carousel::before,
-  .project-carousel::after {
-    width: 24px;
-  }
+  
 
   .project-carousel-group {
     gap: 12px;
@@ -1671,31 +1674,6 @@ html[data-theme="light"] .project-gallery-thumbnail {
   }
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .project-carousel {
-    overflow-x: auto;
-    margin-block: 0;
-    padding-block: 28px;
-    scrollbar-color:
-      var(--accent)
-      transparent;
-    scrollbar-width: thin;
-  }
-
-  .project-carousel-track {
-    animation: none;
-    transform: none;
-  }
-
-  .project-carousel-group[aria-hidden="true"] {
-    display: none;
-  }
-
-  .project-carousel::before,
-  .project-carousel::after {
-    display: none;
-  }
-}
 /* ========================================
    Collapsible Fun Facts section
    ======================================== */
@@ -2946,13 +2924,23 @@ html[data-theme="light"] .nav-projects.is-open .nav-projects-control {
     scroll-behavior: auto;
   }
 
-  *,
-  *::before,
-  *::after {
+  *:not(.project-carousel-track),
+  *:not(.project-carousel-track)::before,
+  *:not(.project-carousel-track)::after {
     scroll-behavior: auto !important;
     transition-duration: 0.01ms !important;
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .project-carousel-track {
+    animation:
+      project-carousel-scroll
+      70s
+      linear
+      infinite;
   }
 }
 
