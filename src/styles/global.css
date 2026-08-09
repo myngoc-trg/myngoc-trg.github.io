@@ -1279,7 +1279,12 @@ html[data-theme="light"] .project-card-link {
 .project-carousel-track {
   display: flex;
   width: max-content;
+  flex-wrap: nowrap;
+
   will-change: transform;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+
   animation:
     project-carousel-scroll
     70s
@@ -1289,6 +1294,7 @@ html[data-theme="light"] .project-card-link {
 
 .project-carousel-group {
   display: flex;
+  flex: 0 0 auto;
   gap: 18px;
   padding-right: 18px;
 }
