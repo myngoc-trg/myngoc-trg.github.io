@@ -2939,7 +2939,6 @@ html[data-theme="light"] .nav-projects.is-open .nav-projects-control {
     padding-left: 52px;
   }
 }
-
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
@@ -2953,6 +2952,18 @@ html[data-theme="light"] .nav-projects.is-open .nav-projects-control {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
   }
+}
+
+/*
+  Desktop only:
+  keep the CSS carousel animation.
+
+  On phones <= 640px, JavaScript controls
+  the carousel instead.
+*/
+@media
+  (prefers-reduced-motion: reduce)
+  and (min-width: 641px) {
 
   .project-carousel-group {
     animation:
