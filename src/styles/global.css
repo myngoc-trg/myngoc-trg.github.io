@@ -2907,15 +2907,16 @@ html[data-theme="light"] .nav-projects.is-open .nav-projects-control {
   }
 
   .skill-tiles {
-    gap: 8px;
-    justify-content: center;
-  }
+  gap: 10px;
+  justify-content: center;
+}
 
-  .skill-tiles li {
-    width: 72px;
-    height: 72px;
-    font-size: 0.63rem;
-  }
+.skill-tiles li {
+  width: 112px;
+  height: 112px;
+  padding: 8px 6px;
+  font-size: 0.7rem;
+}
 
   .button-row,
   .button {
