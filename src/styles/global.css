@@ -1845,8 +1845,8 @@ html[data-theme="light"] .project-gallery-thumbnail {
   }
 
   .skill-tiles li {
-    width: 108px;
-    height: 108px;
+    width: 112px;
+    height: 112px;
     padding: 8px 6px;
   }
 
@@ -4279,22 +4279,5 @@ main {
     .project-card.compact {
     flex: 0 0 252px;
     scroll-snap-align: none;
-  }
-}
-
-@media (max-width: 900px) {
-  .project-carousel .project-card-badges {
-    flex-wrap: nowrap;
-    gap: 5px;
-    right: 8px;
-    left: 8px;
-  }
-
-  .project-carousel .project-card-badges span {
-    padding: 4px 6px;
-    font-size: 0.5rem;
-    line-height: 1.15;
-    letter-spacing: 0.02em;
-    white-space: nowrap;
   }
 }
