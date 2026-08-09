@@ -1280,6 +1280,13 @@ html[data-theme="light"] .project-card-link {
   display: flex;
   width: max-content;
   flex-wrap: nowrap;
+}
+
+.project-carousel-group {
+  display: flex;
+  flex: 0 0 auto;
+  gap: 18px;
+  padding-right: 18px;
 
   will-change: transform;
   backface-visibility: hidden;
@@ -1292,19 +1299,12 @@ html[data-theme="light"] .project-card-link {
     infinite;
 }
 
-.project-carousel-group {
-  display: flex;
-  flex: 0 0 auto;
-  gap: 18px;
-  padding-right: 18px;
-}
-
 /* Pause when someone interacts with the carousel */
 
 .project-carousel:hover
-  .project-carousel-track,
+  .project-carousel-group,
 .project-carousel:focus-within
-  .project-carousel-track {
+  .project-carousel-group {
   animation-play-state: paused;
 }
 
@@ -1657,7 +1657,7 @@ html[data-theme="light"] .project-gallery-thumbnail {
   }
 
   to {
-    transform: translate3d(-50%, 0, 0);
+    transform: translate3d(-100%, 0, 0);
   }
 }
 
@@ -2930,18 +2930,16 @@ html[data-theme="light"] .nav-projects.is-open .nav-projects-control {
     scroll-behavior: auto;
   }
 
-  *:not(.project-carousel-track),
-  *:not(.project-carousel-track)::before,
-  *:not(.project-carousel-track)::after {
+  *:not(.project-carousel-group),
+  *:not(.project-carousel-group)::before,
+  *:not(.project-carousel-group)::after {
     scroll-behavior: auto !important;
     transition-duration: 0.01ms !important;
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
   }
-}
 
-@media (prefers-reduced-motion: reduce) {
-  .project-carousel-track {
+  .project-carousel-group {
     animation:
       project-carousel-scroll
       70s
