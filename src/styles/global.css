@@ -2908,6 +2908,7 @@ html[data-theme="light"] .nav-projects.is-open .nav-projects-control {
 
   .skill-tiles {
     gap: 8px;
+    justify-content: center;
   }
 
   .skill-tiles li {
