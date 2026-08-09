@@ -4193,3 +4193,43 @@ main {
     height: 460px;
   }
 }
+
+/* ========================================
+   FINAL iPhone carousel override
+   Must stay at the bottom of this file
+   ======================================== */
+
+@media (max-width: 640px) {
+  .project-carousel {
+    overflow-x: auto;
+    overflow-y: hidden;
+
+    clip-path: none;
+    scroll-behavior: auto;
+
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+
+  .project-carousel::-webkit-scrollbar {
+    display: none;
+    width: 0;
+    height: 0;
+  }
+
+  .project-carousel-track {
+    transform: none;
+    will-change: auto;
+  }
+
+  .project-carousel-group {
+    animation: none;
+    transform: none;
+    will-change: auto;
+  }
+
+  .project-carousel
+    .project-card.compact {
+    scroll-snap-align: none;
+  }
+}
