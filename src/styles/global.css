@@ -1839,6 +1839,21 @@ html[data-theme="light"] .project-gallery-thumbnail {
   .fun-facts-list p {
     font-size: 0.82rem;
   }
+
+  .skill-tiles {
+    gap: 10px;
+  }
+
+  .skill-tiles li {
+    width: 92px;
+    height: 92px;
+    padding: 8px 6px;
+  }
+
+  .skill-tiles li:nth-child(9) {
+    font-size: 0.62rem;
+    line-height: 1.08;
+  }
 }
 
 
