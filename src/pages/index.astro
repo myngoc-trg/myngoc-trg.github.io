@@ -229,111 +229,132 @@ import { funFacts, site, skills } from '../data/site';
 
 <script>
   const setupMobileProjectCarousel = () => {
-    const carousel =
-      document.querySelector<HTMLElement>(
-        '.project-carousel'
-      );
-
-    const track =
-      carousel?.querySelector<HTMLElement>(
-        '.project-carousel-track'
-      );
-
     const firstGroup =
-      carousel?.querySelector<HTMLElement>(
+      document.querySelector<HTMLElement>(
         '.project-carousel-group:not(.project-carousel-group-clone)'
       );
 
-    const cloneGroup =
-      carousel?.querySelector<HTMLElement>(
-        '.project-carousel-group-clone'
-      );
-
-    if (
-      !carousel ||
-      !track ||
-      !firstGroup ||
-      !cloneGroup
-    ) {
+    if (!firstGroup) {
       return;
     }
 
     if (
-      carousel.dataset.mobileCarouselReady ===
+      firstGroup.dataset.mobileLoopReady ===
       'true'
     ) {
       return;
     }
 
-    carousel.dataset.mobileCarouselReady =
+    firstGroup.dataset.mobileLoopReady =
       'true';
 
+    /*
+      Use this version for phones in both
+      portrait and landscape.
+    */
     const mobileQuery =
       window.matchMedia(
-        '(max-width: 640px)'
+        '(max-width: 900px)'
       );
 
     /*
-      The exact point where the duplicate copy starts.
-      This is safer than estimating the first group's
-      rendered width.
+      Remember the original order so the
+      desktop carousel can be restored.
     */
-    let resetPoint = cloneGroup.offsetLeft;
+    const originalCards =
+      Array.from(firstGroup.children);
 
-    const updateResetPoint = () => {
-      resetPoint = cloneGroup.offsetLeft;
+    let offset = 0;
+    let previousTime = performance.now();
+    let pixelsPerMillisecond = 0;
+    let gap = 12;
+    let wasMobile = false;
+
+    const updateMetrics = () => {
+      const styles =
+        window.getComputedStyle(firstGroup);
+
+      const parsedGap =
+        parseFloat(styles.columnGap);
+
+      gap =
+        Number.isFinite(parsedGap)
+          ? parsedGap
+          : 12;
+
+      /*
+        Keep approximately the same 70-second
+        speed as the desktop carousel.
+      */
+      pixelsPerMillisecond =
+        firstGroup.scrollWidth / 70000;
     };
 
-    const resizeObserver =
-      new ResizeObserver(updateResetPoint);
+    const restoreOriginalOrder = () => {
+      originalCards.forEach((card) => {
+        firstGroup.appendChild(card);
+      });
 
-    resizeObserver.observe(track);
-
-    window.addEventListener(
-      'resize',
-      updateResetPoint
-    );
-
-    let previousTime = performance.now();
-
-    /*
-      Same approximate speed as your
-      original 70-second carousel.
-    */
-    const duration = 70000;
+      offset = 0;
+      firstGroup.style.transform = '';
+    };
 
     const animate = (
       currentTime: number
     ) => {
-      const elapsed = Math.min(
-        currentTime - previousTime,
-        50
-      );
+      const elapsed =
+        Math.min(
+          currentTime - previousTime,
+          50
+        );
 
       previousTime = currentTime;
 
-      if (
-        mobileQuery.matches &&
-        resetPoint > 0
-      ) {
-        const speed =
-          resetPoint / duration;
-
-        let nextPosition =
-          carousel.scrollLeft +
-          speed * elapsed;
-
-        /*
-          As soon as we enter the duplicate copy,
-          jump to the mathematically identical
-          position in the first copy.
-        */
-        if (nextPosition >= resetPoint) {
-          nextPosition -= resetPoint;
+      if (mobileQuery.matches) {
+        if (!wasMobile) {
+          restoreOriginalOrder();
+          updateMetrics();
+          wasMobile = true;
         }
 
-        carousel.scrollLeft =
-          nextPosition;
+        offset +=
+          pixelsPerMillisecond *
+          elapsed;
+
+        const firstCard =
+          firstGroup.firstElementChild as
+            HTMLElement | null;
+
+        if (firstCard) {
+          const cardStep =
+            firstCard.getBoundingClientRect()
+              .width + gap;
+
+          /*
+            As soon as one card has completely
+            moved off the left side, move that
+            exact DOM element to the end.
+
+            The carousel therefore never reaches
+            an empty area.
+          */
+          if (
+            cardStep > 0 &&
+            offset >= cardStep
+          ) {
+            offset -= cardStep;
+
+            firstGroup.appendChild(
+              firstCard
+            );
+          }
+        }
+
+        firstGroup.style.transform =
+          `translate3d(${-offset}px, 0, 0)`;
+      } else if (wasMobile) {
+        restoreOriginalOrder();
+        wasMobile = false;
       }
 
       requestAnimationFrame(animate);

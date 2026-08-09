@@ -4195,41 +4195,58 @@ main {
 }
 
 /* ========================================
-   FINAL iPhone carousel override
-   Must stay at the bottom of this file
+   FINAL mobile carousel
+   Card-recycling version
+   Keep this at the bottom of the file
    ======================================== */
 
-@media (max-width: 640px) {
+@media (max-width: 900px) {
   .project-carousel {
-    overflow-x: auto;
-    overflow-y: hidden;
-
+    overflow: hidden;
     clip-path: none;
-    scroll-behavior: auto;
-
-    scrollbar-width: none;
-    -ms-overflow-style: none;
-  }
-
-  .project-carousel::-webkit-scrollbar {
-    display: none;
-    width: 0;
-    height: 0;
   }
 
   .project-carousel-track {
+    display: flex;
+    width: max-content;
     transform: none;
     will-change: auto;
   }
 
+  /*
+    CSS animation is completely disabled
+    on mobile. JavaScript controls only
+    the original group.
+  */
   .project-carousel-group {
     animation: none;
-    transform: none;
-    will-change: auto;
+  }
+
+  .project-carousel-group:not(
+    .project-carousel-group-clone
+  ) {
+    display: flex;
+    flex: 0 0 auto;
+
+    gap: 12px;
+    padding-right: 0;
+
+    transform: translate3d(0, 0, 0);
+    will-change: transform;
+  }
+
+  /*
+    Mobile does not need the duplicate group.
+    Cards from the original group are recycled
+    continuously instead.
+  */
+  .project-carousel-group-clone {
+    display: none;
   }
 
   .project-carousel
     .project-card.compact {
+    flex: 0 0 252px;
     scroll-snap-align: none;
   }
 }
