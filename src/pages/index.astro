@@ -226,7 +226,113 @@ import { funFacts, site, skills } from '../data/site';
     </details>
   </div>
 </section>
+
+
+<script>
+  const setupMobileProjectCarousel = () => {
+    const carousel =
+      document.querySelector<HTMLElement>(
+        '.project-carousel'
+      );
+
+    if (!carousel) {
+      return;
+    }
+
+    if (
+      carousel.dataset.mobileCarouselReady ===
+      'true'
+    ) {
+      return;
+    }
+
+    const firstGroup =
+      carousel.querySelector<HTMLElement>(
+        '.project-carousel-group:not(.project-carousel-group-clone)'
+      );
+
+    if (!firstGroup) {
+      return;
+    }
+
+    carousel.dataset.mobileCarouselReady =
+      'true';
+
+    const mobileQuery =
+      window.matchMedia(
+        '(max-width: 640px)'
+      );
+
+    let loopWidth =
+      firstGroup.getBoundingClientRect().width;
+
+    const updateWidth = () => {
+      loopWidth =
+        firstGroup.getBoundingClientRect().width;
+    };
+
+    const resizeObserver =
+      new ResizeObserver(updateWidth);
+
+    resizeObserver.observe(firstGroup);
+
+    let previousTime =
+      performance.now();
+
+    const duration = 70000;
+
+    const animate = (
+      currentTime: number
+    ) => {
+      const elapsed =
+        Math.min(
+          currentTime - previousTime,
+          50
+        );
+
+      previousTime = currentTime;
+
+      if (
+        mobileQuery.matches &&
+        loopWidth > 0
+      ) {
+        const pixelsPerMillisecond =
+          loopWidth / duration;
+
+        carousel.scrollLeft +=
+          pixelsPerMillisecond *
+          elapsed;
+
+        /*
+          As soon as the first complete copy has
+          passed, jump back by exactly its width.
+
+          Because the second group is identical,
+          this jump is visually invisible.
+        */
+        if (
+          carousel.scrollLeft >= loopWidth
+        ) {
+          carousel.scrollLeft -= loopWidth;
+        }
+      }
+
+      requestAnimationFrame(animate);
+    };
+
+    requestAnimationFrame(animate);
+  };
+
+  setupMobileProjectCarousel();
+
+  document.addEventListener(
+    'astro:page-load',
+    setupMobileProjectCarousel
+  );
+</script>
+
 </BaseLayout>
+
 
 <script>
   const prepareCarouselClones = () => {

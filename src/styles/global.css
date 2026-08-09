@@ -1665,13 +1665,28 @@ html[data-theme="light"] .project-gallery-thumbnail {
   .project-carousel {
     margin-block: -22px;
     padding-block: 58px;
+
+    overflow: hidden;
+    scroll-behavior: auto;
   }
 
-  
+  .project-carousel-track {
+    transform: none;
+    will-change: auto;
+  }
 
+  /*
+    On mobile, JavaScript controls the movement.
+    Disable the CSS animation on BOTH project groups.
+  */
   .project-carousel-group {
+    flex: 0 0 auto;
     gap: 12px;
     padding-right: 12px;
+
+    animation: none;
+    transform: none;
+    will-change: auto;
   }
 
   .project-carousel
