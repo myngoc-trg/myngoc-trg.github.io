@@ -1660,14 +1660,32 @@ html[data-theme="light"] .project-gallery-thumbnail {
     transform: translate3d(-100%, 0, 0);
   }
 }
-
 @media (max-width: 640px) {
   .project-carousel {
     margin-block: -22px;
     padding-block: 58px;
 
-    overflow: hidden;
+    /*
+      Make this a real horizontal scroll container
+      for iOS Safari.
+    */
+    overflow-x: auto;
+    overflow-y: hidden;
+
     scroll-behavior: auto;
+
+    /* Hide the scrollbar */
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+
+    /* Do not allow Safari momentum/snap behaviour */
+    overscroll-behavior-x: none;
+  }
+
+  .project-carousel::-webkit-scrollbar {
+    display: none;
+    width: 0;
+    height: 0;
   }
 
   .project-carousel-track {
@@ -1675,10 +1693,6 @@ html[data-theme="light"] .project-gallery-thumbnail {
     will-change: auto;
   }
 
-  /*
-    On mobile, JavaScript controls the movement.
-    Disable the CSS animation on BOTH project groups.
-  */
   .project-carousel-group {
     flex: 0 0 auto;
     gap: 12px;
@@ -1692,6 +1706,7 @@ html[data-theme="light"] .project-gallery-thumbnail {
   .project-carousel
     .project-card.compact {
     flex: 0 0 252px;
+    scroll-snap-align: none;
   }
 }
 

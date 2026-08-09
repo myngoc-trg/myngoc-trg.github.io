@@ -227,7 +227,6 @@ import { funFacts, site, skills } from '../data/site';
   </div>
 </section>
 
-
 <script>
   const setupMobileProjectCarousel = () => {
     const carousel =
@@ -235,7 +234,27 @@ import { funFacts, site, skills } from '../data/site';
         '.project-carousel'
       );
 
-    if (!carousel) {
+    const track =
+      carousel?.querySelector<HTMLElement>(
+        '.project-carousel-track'
+      );
+
+    const firstGroup =
+      carousel?.querySelector<HTMLElement>(
+        '.project-carousel-group:not(.project-carousel-group-clone)'
+      );
+
+    const cloneGroup =
+      carousel?.querySelector<HTMLElement>(
+        '.project-carousel-group-clone'
+      );
+
+    if (
+      !carousel ||
+      !track ||
+      !firstGroup ||
+      !cloneGroup
+    ) {
       return;
     }
 
@@ -243,15 +262,6 @@ import { funFacts, site, skills } from '../data/site';
       carousel.dataset.mobileCarouselReady ===
       'true'
     ) {
-      return;
-    }
-
-    const firstGroup =
-      carousel.querySelector<HTMLElement>(
-        '.project-carousel-group:not(.project-carousel-group-clone)'
-      );
-
-    if (!firstGroup) {
       return;
     }
 
@@ -263,58 +273,67 @@ import { funFacts, site, skills } from '../data/site';
         '(max-width: 640px)'
       );
 
-    let loopWidth =
-      firstGroup.getBoundingClientRect().width;
+    /*
+      The exact point where the duplicate copy starts.
+      This is safer than estimating the first group's
+      rendered width.
+    */
+    let resetPoint = cloneGroup.offsetLeft;
 
-    const updateWidth = () => {
-      loopWidth =
-        firstGroup.getBoundingClientRect().width;
+    const updateResetPoint = () => {
+      resetPoint = cloneGroup.offsetLeft;
     };
 
     const resizeObserver =
-      new ResizeObserver(updateWidth);
+      new ResizeObserver(updateResetPoint);
 
-    resizeObserver.observe(firstGroup);
+    resizeObserver.observe(track);
 
-    let previousTime =
-      performance.now();
+    window.addEventListener(
+      'resize',
+      updateResetPoint
+    );
 
+    let previousTime = performance.now();
+
+    /*
+      Same approximate speed as your
+      original 70-second carousel.
+    */
     const duration = 70000;
 
     const animate = (
       currentTime: number
     ) => {
-      const elapsed =
-        Math.min(
-          currentTime - previousTime,
-          50
-        );
+      const elapsed = Math.min(
+        currentTime - previousTime,
+        50
+      );
 
       previousTime = currentTime;
 
       if (
         mobileQuery.matches &&
-        loopWidth > 0
+        resetPoint > 0
       ) {
-        const pixelsPerMillisecond =
-          loopWidth / duration;
+        const speed =
+          resetPoint / duration;
 
-        carousel.scrollLeft +=
-          pixelsPerMillisecond *
-          elapsed;
+        let nextPosition =
+          carousel.scrollLeft +
+          speed * elapsed;
 
         /*
-          As soon as the first complete copy has
-          passed, jump back by exactly its width.
-
-          Because the second group is identical,
-          this jump is visually invisible.
+          As soon as we enter the duplicate copy,
+          jump to the mathematically identical
+          position in the first copy.
         */
-        if (
-          carousel.scrollLeft >= loopWidth
-        ) {
-          carousel.scrollLeft -= loopWidth;
+        if (nextPosition >= resetPoint) {
+          nextPosition -= resetPoint;
         }
+
+        carousel.scrollLeft =
+          nextPosition;
       }
 
       requestAnimationFrame(animate);
