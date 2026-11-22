@@ -28,6 +28,9 @@ export interface Project {
   actions: string[];
   results: string[];
   learnings?: string[];
+  projectLink?: string;
+  projectLinkLabel?: string;
+  pdf?: string;
 }
 
 export const projects: Project[] = [
@@ -96,6 +99,8 @@ export const projects: Project[] = [
   'Identified that most remaining uncertainty was concentrated between two visually similar species rather than across the full classification problem.',
   'Published a reproducible codebase with documented experiments, assumptions, limitations, and an open-access thesis.',
   ],
+  projectLink: "https://lup.lub.lu.se/student-papers/search/publication/9244882"
+  ,projectLinkLabel: 'View Thesis'
   },
 
   {
@@ -188,6 +193,8 @@ export const projects: Project[] = [
     'The temperature analysis found evidence that the Arctic Oscillation index was associated with the location of the maximum-winter-temperature distribution. Including the covariate in the scale parameter did not provide sufficient additional improvement, supporting a simpler model in which the covariate affected the expected level of extremes but not their variability.',
     'The hurricane analysis produced a threshold-exceedance model for damages above approximately USD 6 billion. The model provided a structured basis for estimating rare annual loss levels while making the limited number of extreme observations and the resulting statistical uncertainty visible.',
   ],
+    projectLink: "https://github.com/myngoc-trg/MASM15_lab2"
+    ,projectLinkLabel: 'View GitHub Repository'
   },
   {
     slug: 'profitability-scenario-assistant',
@@ -285,6 +292,8 @@ export const projects: Project[] = [
             'The neural-network models achieved approximately 87% test accuracy but did not outperform the tree-based model on the structured tabular data.',
             'Created a reusable end-to-end workflow connecting data validation, statistical exploration, imbalance treatment, modelling, evaluation, and interpretation.',
     ],
+    projectLink: "https://github.com/myngoc-trg/BERN02_Project_Credit_Risk"
+    ,projectLinkLabel: 'View GitHub Repository'
   },
 
     {
@@ -327,7 +336,7 @@ export const projects: Project[] = [
     'Created a foundation for broader discounted-cash-flow and profitability analysis.',
   ],
   },
- 
+
   {
     slug: 'regression-modelling-beta-carotene',
     title: 'Regression Modelling of Plasma β-Carotene Concentration',
@@ -385,8 +394,10 @@ export const projects: Project[] = [
       'Simplified the model from 13 to 5 parameters with minimal loss of performance.',
       'Achieved the lowest AIC and BIC while maintaining interpretability.',
     ],
+    projectLink: "https://github.com/myngoc-trg/MASM22-Linear-and-Logistic-Regression-project-1"
+    ,projectLinkLabel: 'View GitHub Repository'
   },
-   {
+  {
     slug: 'ice-melting-rate-analysis',
     title: 'Experimental Design for Ice-Melting Rate Analysis',
     kind: 'Study',
@@ -400,8 +411,29 @@ export const projects: Project[] = [
     gallery: [
       {
         src: '/images/masc05-comerc.png',
-        alt: 'Experimental setup for ice-melting rate analysis',
+        alt: 'Experimental description',
       },
+      {
+        src: '/images/masc05-plan.jpg',
+        alt: 'Experimental Plan',
+      },
+      {
+        src: '/images/masc05-data.jpg',
+        alt: 'Data Collection',
+      },
+      {
+        src: '/images/masc05-changeinmass_material_air.png',
+        alt: 'Change in Mass under Surface Material and Air Flow',
+      },
+      {
+        src: '/images/masc05-changeinmass_salt_insulation.png',
+        alt: 'Change in Mass under Salt Presence and Insulation',
+      },
+      {
+        src: '/images/masc05-changeinmass_color_water.png',
+        alt: 'Change in Mass under Color and Water Bath Presence',
+      },
+
     ],
     skills: ['Design of Experiments', 'Fractional Factorial Design', 'Statistical Modelling', 'ANOVA', 'ANCOVA', 'Interaction Analysis', 'Model Diagnostics', 'R'],
     featured: false,
@@ -432,7 +464,8 @@ export const projects: Project[] = [
       'The lowest mass loss occurred with glass, no airflow and foil insulation.',
       'Model diagnostics supported the reliability of the findings.',
     ],
-
+    projectLink: "https://github.com/myngoc-trg/MASC05-Design-of-Experiments/tree/main/Final%20Project"
+    ,projectLinkLabel: 'View GitHub Repository'
   },
   {
     slug: 'robot-localisation-hmm',
@@ -480,6 +513,8 @@ export const projects: Project[] = [
     'Created running-error visualisations that showed how localisation performance developed over time rather than relying on one final value.',
     'Demonstrated that evaluation conditions, sensor assumptions, and stochastic variation can materially affect the apparent performance of a tracking method.',
   ],
+  projectLink: "https://github.com/myngoc-trg/EDAP01_AtificialIntelligence/tree/main/assignments_by_elin-main-assignment2/assignment2"
+  ,projectLinkLabel: 'View GitHub Repository'
   },
   {
     slug: 'monadic-parser-interpreter',
@@ -525,6 +560,8 @@ export const projects: Project[] = [
       'Demonstrated how a complete programming language can be systematically decomposed into composable functional modules with clear separation of concerns',
       'Strengthened ability to design and reason about recursive systems, operator grammars, immutable state transitions, error propagation, and strongly typed module interactions',
     ],
+    projectLink: "https://github.com/myngoc-trg/EDAN40_FuntionalProgramming/tree/main/A3N%20-%20Monadic%20Parsing"
+    ,projectLinkLabel: 'View GitHub Repository'
   },
  
 ];

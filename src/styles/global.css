@@ -3583,6 +3583,10 @@ html[data-theme="light"] .form-field textarea:focus {
   margin-bottom: 26px;
 }
 
+.project-links {
+  margin-top: 6px;
+}
+
 .case-title-image {
   width: fit-content;
   max-width: 520px;

@@ -79,6 +79,35 @@ const galleryImages =
           ))
         }
       </ul>
+            {
+              (project.projectLink || project.pdf) && (
+                <div class="button-row project-links">
+                  {project.projectLink && (
+                    <a
+                      href={project.projectLink}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      class="button button-secondary"
+                    >
+                      {project.projectLinkLabel ?? 'View project'}
+                      <span aria-hidden="true">↗</span>
+                    </a>
+                  )}
+
+                  {project.pdf && (
+                    <a
+                      href={project.pdf}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      class="button button-primary"
+                    >
+                      View PDF
+                      <span aria-hidden="true">↗</span>
+                    </a>
+                  )}
+                </div>
+              )
+            }
     </div>
   </div>
 
